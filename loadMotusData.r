@@ -22,37 +22,29 @@ hits.df <- select(hits.tbl,
 ### Load RECEIVER METADATA ###
 receiverData <- read_csv("data/receiver-deployments.csv") %>%
   mutate(
-    tsStart = as.POSIXct(tsStart,origin='1970-01-01'),
-    tsEnd = as.POSIXct(tsEnd,origin='1970-01-01'),
+    tsStart = as.POSIXct(tsStart,origin = '1970-01-01'),
+    tsEnd = as.POSIXct(tsEnd,origin = '1970-01-01'),
     deploymentName = gsub("<[^\\]]*>", "", deploymentName, perl = TRUE)
   ) %>%
   select(recv = receiverID, latitude, longitude, recvDepStart = tsStart, recvDepEnd = tsEnd) 
-
-## Load Shitlist
-shitList <- read_csv('109-shitSites.csv', col_names = c('site'))$site
 
 ### Load Tag deployment METADATA ###
 tagDeploymentData <- read_csv("data/tag-deployments.csv") %>%
   mutate(
     id = as.factor(mfgID),
-    tsStart = as.POSIXct(tsStart,origin='1970-01-01'),
-    tsEnd = as.POSIXct(tsEnd,origin='1970-01-01'),
+    tsStart = as.POSIXct(tsStart,origin = '1970-01-01'),
+    tsEnd = as.POSIXct(tsEnd,origin = '1970-01-01'),
     age = ifelse(age == 2, 'Hatch-year', 'Adult')
   ) %>%
   select(markerNumber, tsStart, tsEnd, age, sex, tagDeployID, weight, wing) 
 
 # Fix raw data dates/times and ID
 rawDataComb <- hits.df %>%
-  #  filter(lat != 0, lon != 0) %>%
-  #  rename(gpsLat = lat, gpsLon = lon, site = recvDeployName)
   mutate(
-    ts = as.POSIXct(ts,origin='1970-01-01'),
-    #    id = as.character(motusTagID),
-    date = format(ts,"%Y-%m-%d"),
-  #  site = ifelse(site %in% bpsites, 'Bon Portage', ifelse(site %in% sealsites, 'Seal Island', site)),
-    lat = ifelse(lat == 0 | is.na(lat), receiverData[receiverData$recv == recv & receiverData$recvDepStart <= ts & (is.na(receiverData$recvDepEnd) | receiverData$recvDepEnd >= ts), ]$latitude,lat),
-    lon = ifelse(lat == 0 | is.na(lon), receiverData[receiverData$recv == recv & receiverData$recvDepStart <= ts & (is.na(receiverData$recvDepEnd) | receiverData$recvDepEnd >= ts), ]$longitude,lon)
-#    lon = ifelse(lon == 0 | is.na(lon), ,lon)
+    ts = as.POSIXct(ts,origin = '1970-01-01'),
+    date = format(ts, "%Y-%m-%d"),
+    lat = ifelse(lat == 0 | is.na(lat), receiverData[receiverData$recv == recv & receiverData$recvDepStart <= ts & (is.na(receiverData$recvDepEnd) | receiverData$recvDepEnd >= ts), ]$latitude, lat),
+    lon = ifelse(lat == 0 | is.na(lon), receiverData[receiverData$recv == recv & receiverData$recvDepStart <= ts & (is.na(receiverData$recvDepEnd) | receiverData$recvDepEnd >= ts), ]$longitude, lon)
   ) %>%
   left_join(tagDeploymentData, by = 'markerNumber')
 
@@ -60,29 +52,15 @@ rawDataComb <- hits.df %>%
 
 # Fix the data Again
 rawDataComb %>%
-  select(id,
-         hitID,
-         runID,
-         sig,
-         motusTagID, 
-         markerNumber, batchID, 
+  select(id, hitID, runID, motusTagID,
+         sig, markerNumber, batchID, 
          freqsd, sigsd, slop, burstSlop,
          antType, antBearing, 
-         recv,tagDeployID,
-         ts, 
-         date, 
-         site,
-         age,
-         sex,
-         wing,
-         weight, 
-         depLon, 
-         depLat, 
-         lon, 
-         lat, 
-         runLen, 
-         spEN) %>%
-#  filter(!is.na(markerNumber), !site %in% c('Old Cut','OLDCUT', shitList), runLen > 2, lon != 0 & !is.na(lon)) %>%
+         recv, tagDeployID,
+         ts, date, site,
+         age, sex, wing, weight, 
+         depLon, depLat, lon, lat, 
+         runLen, spEN) %>%
   mutate(
     date = format(ts,"%Y-%m-%d"),
     hour = format(ts,"%Y-%m-%d %H"),
@@ -91,5 +69,4 @@ rawDataComb %>%
     recvDeployName = site,
     tagDeployID = markerNumber
   )
-
 }
