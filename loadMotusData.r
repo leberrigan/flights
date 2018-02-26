@@ -1,26 +1,24 @@
 library(tidyverse) 
 library(motus)
+loadMotusData <- function (projectID, database, newDatabase) {
 
-
-loadMotusData <- function (projectID) {
-
-hits.sql <- tagme(projectID, update= TRUE, forceMeta=TRUE)
+hits.sql <- tagme(projectID, new = newDatabase, update = !newDatabase, forceMeta = TRUE, dir = database)
 
 hits.tbl <- tbl(hits.sql, "alltags")
 
 tagMeta <- metadata(hits.sql, projectIDs = projectID)
 
 hits.df <- select(hits.tbl, 
-                  motusTagID, id, hitID, runID, batchID, 
+                  motusTagID, id = mfgID, hitID, runID, batchID, 
                   ts, sig, runLen, freqsd, sigsd, slop, burstSlop,
-                  antType, antBearing, lat, lon, recv,
-                  depLat, depLon, site, markerNumber, spEN) %>% 
+                  antType, antBearing, lat = gpsLat, lon = gpsLon, recv,
+                  depLat = tagDeployLat, depLon = tagDeployLon, site = recvDeployName, markerNumber, spEN = speciesEN) %>% 
   distinct() %>% collect() %>% as.data.frame() %>%
   mutate(ts = as.POSIXct(ts, origin="1970-01-01"), 
          year = year(ts))
 
 ### Load RECEIVER METADATA ###
-receiverData <- read_csv("data/receiver-deployments.csv") %>%
+receiverData <- read_csv(paste0(database, "receiver-deployments.csv", collapse = '')) %>%
   mutate(
     tsStart = as.POSIXct(tsStart,origin = '1970-01-01'),
     tsEnd = as.POSIXct(tsEnd,origin = '1970-01-01'),
@@ -29,7 +27,7 @@ receiverData <- read_csv("data/receiver-deployments.csv") %>%
   select(recv = receiverID, latitude, longitude, recvDepStart = tsStart, recvDepEnd = tsEnd) 
 
 ### Load Tag deployment METADATA ###
-tagDeploymentData <- read_csv("data/tag-deployments.csv") %>%
+tagDeploymentData <- read_csv(paste0(database, "data/tag-deployments.csv", collapse = '')) %>%
   mutate(
     id = as.factor(mfgID),
     tsStart = as.POSIXct(tsStart,origin = '1970-01-01'),
