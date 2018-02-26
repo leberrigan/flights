@@ -1,5 +1,6 @@
 library(tidyverse) 
 library(motus)
+
 loadMotusData <- function (projectID, database, newDatabase) {
 
 hits.sql <- tagme(projectID, new = newDatabase, update = !newDatabase, forceMeta = TRUE, dir = database)
