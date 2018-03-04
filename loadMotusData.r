@@ -28,7 +28,7 @@ receiverData <- read_csv(paste0(database, "receiver-deployments.csv", collapse =
   select(recv = receiverID, latitude, longitude, recvDepStart = tsStart, recvDepEnd = tsEnd) 
 
 ### Load Tag deployment METADATA ###
-tagDeploymentData <- read_csv(paste0(database, "data/tag-deployments.csv", collapse = '')) %>%
+tagDeploymentData <- read_csv(paste0(database, "tag-deployments.csv", collapse = '')) %>%
   mutate(
     id = as.factor(mfgID),
     tsStart = as.POSIXct(tsStart,origin = '1970-01-01'),
@@ -49,7 +49,7 @@ rawDataComb <- hits.df %>%
 
 
 
-# Fix the data Again
+# Fix data Again
 rawDataComb %>%
   select(id, hitID, runID, motusTagID,
          sig, markerNumber, batchID, 
