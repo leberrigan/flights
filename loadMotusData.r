@@ -1,9 +1,9 @@
 library(tidyverse) 
 library(motus)
 
-loadMotusData <- function (projectID, database, newDatabase) {
+loadMotusData <- function (projectID, subfolder, newDatabase) {
 
-hits.sql <- tagme(projectID, new = newDatabase, update = !newDatabase, forceMeta = TRUE, dir = database)
+hits.sql <- tagme(projectID, new = newDatabase, update = !newDatabase, forceMeta = TRUE, dir = subfolder)
 
 hits.tbl <- tbl(hits.sql, "alltags")
 
@@ -19,7 +19,7 @@ hits.df <- select(hits.tbl,
          year = year(ts))
 
 ### Load RECEIVER METADATA ###
-receiverData <- read_csv(paste0(database, "receiver-deployments.csv", collapse = '')) %>%
+receiverData <- read_csv(paste0(subfolder, "receiver-deployments.csv", collapse = '')) %>%
   mutate(
     tsStart = as.POSIXct(tsStart,origin = '1970-01-01'),
     tsEnd = as.POSIXct(tsEnd,origin = '1970-01-01'),
@@ -28,7 +28,7 @@ receiverData <- read_csv(paste0(database, "receiver-deployments.csv", collapse =
   select(recv = receiverID, latitude, longitude, recvDepStart = tsStart, recvDepEnd = tsEnd) 
 
 ### Load Tag deployment METADATA ###
-tagDeploymentData <- read_csv(paste0(database, "tag-deployments.csv", collapse = '')) %>%
+tagDeploymentData <- read_csv(paste0(subfolder, "data/tag-deployments.csv", collapse = '')) %>%
   mutate(
     id = as.factor(mfgID),
     tsStart = as.POSIXct(tsStart,origin = '1970-01-01'),

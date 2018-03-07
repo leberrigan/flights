@@ -115,9 +115,10 @@ flightStats
 
 flightBySunset %>% 
   group_by(markerNumber) %>% 
-  summarise(age = age[1], nflights = n()) %>% 
-  ggplot(aes(age, nflights))+
-  geom_boxplot()
+  summarise(age = age[1], bandsite = bandsite[1], nflights = n()) %>% 
+  ggplot(aes(bandsite, nflights))+
+  geom_boxplot()+
+  facet_grid(age~.)
 
 flightBySunset %>%
   ggplot()+
@@ -200,14 +201,15 @@ flightBySunset %>%
 # Change the viewport so that it can display 4 plots at once
 par(mfrow=c(2,2))
 
-glm1 <- flightBySunset %>% filter(isDep)  %>% glm(formula = log(bySunset) ~ age + jdate + bandsite, family = gaussian)
+glm1 <- flightBySunset %>% filter(isDep)  %>% glm(formula = log(bySunset) ~ age + bandsite, family = gaussian)
 plot(glm1)
 glm2 <- flightBySunset %>% filter(isDep) %>% glm(formula = log(bySunset) ~ age + jdate + bandsite, family = Gamma)
 plot(glm2)
 
-summary(glm2)
+summary(glm1)
 
-anova(glm2, test = 'F')
+anova(glm1, test = 'F')
+
 
 
 glm3 <- flightBySunset %>% glm(formula = log(bySunset) ~ age + jdate + bandsite, family = gaussian)
@@ -235,6 +237,21 @@ glm7 <- flightBySunset %>% filter(isDep) %>% glm(formula = log(bySunset) ~ age *
 plot(glm7)
 summary(glm7)
 anova(glm7, test = 'F')
+
+# new dataframe: Number of flights per bird
+
+nFlights <- flightBySunset %>% 
+  group_by(markerNumber) %>% 
+  summarise(age = age[1], bandsite = bandsite[1], n = n())
+
+glm2 <- nFlights %>% glm(formula = log(n) ~ age * bandsite, family = gaussian)
+
+plot(glm2)
+
+summary(glm2)
+
+anova(glm2, test = 'F')
+
 
 
 
