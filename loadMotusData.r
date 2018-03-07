@@ -28,7 +28,7 @@ receiverData <- read_csv(paste0(subfolder, "receiver-deployments.csv", collapse 
   select(recv = receiverID, latitude, longitude, recvDepStart = tsStart, recvDepEnd = tsEnd) 
 
 ### Load Tag deployment METADATA ###
-tagDeploymentData <- read_csv(paste0(subfolder, "data/tag-deployments.csv", collapse = '')) %>%
+tagDeploymentData <- read_csv(paste0(subfolder, "tag-deployments.csv", collapse = '')) %>%
   mutate(
     id = as.factor(mfgID),
     tsStart = as.POSIXct(tsStart,origin = '1970-01-01'),

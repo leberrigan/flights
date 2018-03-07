@@ -49,6 +49,8 @@ flights.raw <- read_csv("Project109-sigplots-Flights.csv")
 flights.raw <- flights.raw %>%
   mutate(depRunID = ifelse(is.na(depRunID), max(flights.raw[flights.raw$markerNumber == markerNumber, 5:16]), depRunID))
 
+# Get flight meta data
+flight.meta <- flights.raw %>% select(bandsite, markerNumber, code, depRunID)
 
 # Select all hits which correspond to each flight runID
 flights.df <- localHits[localHits$runID %in% as.numeric(unlist(flights.raw[5:16])),]
