@@ -20,9 +20,13 @@ Sys.setenv(TZ = 'GMT')
 # Define Project ID
 projectID <- 109
 
+subfolder <- 'data/'
+
+newDatabase <- F
+
 source("loadMotusData.r")
 
-tagHits <- loadMotusData(projectID)
+tagHits <- loadMotusData(projectID, subfolder, newDatabase)
 
 source("getMetaData.r")
 
@@ -68,7 +72,7 @@ tagHits %>% filter(markerNumber == '1601-83561')
 # Make a grid of plots for each tower visted by each tag
 for (i in unique(fixed_tagHits$markerNumber)[44:110]) {
   print(i)
-#  i <- '1861-32538'
+  #i <- '1861-32538'
   ## Select a single tag and convert to tibble
   markerSigs <- fixed_tagHits %>% filter(markerNumber == i) %>% mutate(site = ifelse(is.na(site), ifelse(is.na(recv), 'UNK', recv), site)) %>%
     mutate(ts = as.POSIXct(ts, origin = '1970-01-01'), antBearing = as.factor(ifelse(is.na(antBearing), 'UNK', antBearing)))
@@ -111,7 +115,7 @@ for (i in unique(fixed_tagHits$markerNumber)[44:110]) {
       ggplot() + # Setting the date to something easy to interpret!
       scale_x_datetime(date_labels = "%d/%m/%y %H:%M:%S", limits = c(earliestDetection, latestDetection)) + # Format the x-axis so it displays the full date
       xlab("Timestamp (D/M/Y H:M:S)") +
-      ggtitle(paste0(i,' - ', unique(markerSigs$age))) +
+      ggtitle(paste(i, unique(markerSigs$age), markerDepFlight$code, sep = ' - ')) +
       geom_vline(xintercept = min(bandingDates), color = 'black', size = 2)+
       geom_vline(xintercept = bandingDates, color = 'black', size = 1)+
       geom_vline(xintercept = sunRiseSetTimes$sunrise, color = 'red')+

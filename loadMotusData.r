@@ -13,6 +13,7 @@ hits.df <- select(hits.tbl,
                   motusTagID, id = mfgID, hitID, runID, batchID, 
                   ts, sig, runLen, freqsd, sigsd, slop, burstSlop,
                   antType, antBearing, lat = gpsLat, lon = gpsLon, recv,
+                  tagDeployStart, tagDeployEnd,
                   depLat = tagDeployLat, depLon = tagDeployLon, site = recvDeployName, markerNumber, spEN = speciesEN) %>% 
   distinct() %>% collect() %>% as.data.frame() %>%
   mutate(ts = as.POSIXct(ts, origin="1970-01-01"), 
@@ -56,6 +57,7 @@ rawDataComb %>%
          freqsd, sigsd, slop, burstSlop,
          antType, antBearing, 
          recv, tagDeployID,
+         tagDeployStart, tagDeployEnd,
          ts, date, site,
          age, sex, wing, weight, 
          depLon, depLat, lon, lat, 
@@ -65,7 +67,7 @@ rawDataComb %>%
     hour = format(ts,"%Y-%m-%d %H"),
     age = ifelse(is.na(age), 'Unknown', age),
     year = format(ts, '%Y'),
-    recvDeployName = site,
-    tagDeployID = markerNumber
+    recvDeployName = site
+ #   tagDeployID = markerNumber
   )
 }

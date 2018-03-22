@@ -115,3 +115,4 @@ flightBySunset <- flightTimes %>%
          bySunset = (as.numeric(ts)/60) - (as.numeric(sunset)/60))
 
 write_csv(flightBySunset %>% select(-sunset), "flightBySunset.csv")
+
